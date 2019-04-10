@@ -42,6 +42,8 @@ def get_target_sport_id(target_user_object_id):
                     addWhereEqualTo('user', target_user_object_id)
                     )
     dict_array = result.jsonData.get(u'results')
+    if len(dict_array) == 0:
+        return
 
     # 生成机器学习所需的X，Y
     index = -1
@@ -55,7 +57,7 @@ def get_target_sport_id(target_user_object_id):
     model = LinearRegression()
     model.fit(indexes, heat_change)
     predict_heat_change = model.predict([[index + 1]])
-    target_calories = -predict_heat_change
+    target_calories = -predict_heat_change[0][0]
 
     # 查询大概符合热量变化的运动
     result = b.find('Sport',
