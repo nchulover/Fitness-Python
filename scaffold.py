@@ -31,14 +31,14 @@ class BodyToleranceCalculator:
             [35, 37, 39, 41, 42, 43, 46, 49, 51, 53, 54, 57, 59, 61, 63, 64, 65, 67, 68, 69, 70]
         ]
         self.bmi_table = [
-            [18.5, 24, 27, 30, 40]
+            40, 30, 27, 24, 18.5
         ]
 
     def work(self):
         self.statistic = self.__get_statistic__(self.user_id)
         self.bmi = self.__calculate_bmi__(self.statistic)
         self.vcwi = self.__calculate_vital_capacity_and_weight_index__(self.statistic)
-        self.body_tolerance = self.evaluate_body_tolerance()
+        self.body_tolerance = self.__evaluate_body_tolerance__()
 
     @staticmethod
     def __get_statistic__(user_id):
@@ -62,7 +62,7 @@ class BodyToleranceCalculator:
 
     @staticmethod
     def __calculate_bmi__(statistic):
-        return statistic.weight / (statistic.height / 100) ^ 2
+        return statistic.weight / pow((statistic.height / 100), 2)
 
     @staticmethod
     def __calculate_vital_capacity_and_weight_index__(statistic):
@@ -105,10 +105,10 @@ class BodyToleranceCalculator:
         """
         judged = False
         level_index = 0
-        if user_bmi <= bmi_table[0]:
+        if user_bmi >= bmi_table[0]:
             level_index = 0
             judged = True
-        elif user_bmi >= bmi_table[len(bmi_table) - 1]:
+        elif user_bmi <= bmi_table[len(bmi_table) - 1]:
             level_index = len(bmi_table)
             judged = True
 
@@ -116,7 +116,7 @@ class BodyToleranceCalculator:
             for i in range(0, len(bmi_table) - 2):
                 left = bmi_table[i]
                 right = bmi_table[i + 1]
-                if left <= bmi_table <= right:
+                if left >= bmi_table >= right:
                     level_index = i + 1
         # 将[0, len] -> [1, 10]
         # y = 9/len * x + 1
@@ -278,22 +278,66 @@ class NetHeatCalculator:
 
     @staticmethod
     def work(predict_income, weight):
-        return predict_income - weight * 9
+        return predict_income - weight * 18
+
+
+class ExerciseTask:
+    def __init__(self, sport, time):
+        self.sport = sport
+        self.time = time
+
+    def to_string(self):
+        return 'sport=[' + self.sport.sport_name + '], time=[' + str(self.time) + ' h]'
+
+
+class MultiExerciseTask:
+    def __init__(self, task_list):
+        self.task_list = task_list
+
+    def to_string(self):
+        string = ''
+        for task in self.task_list:
+            string += task.to_string() + ', '
+        return string
 
 
 class ExerciseTaskMaker:
 
-    def __int__(self, user, statistic):
+    def __init__(self, user, statistic):
         self.user = user
         worker = AvailableSportGetter(user)
         worker.work()
         self.available_sport_list = worker.available_sport_list
         predict_income = HeatIncomeModel(user).predict(datetime.date.today() + datetime.timedelta(days=1))
         self.net_heat = NetHeatCalculator.work(predict_income, statistic.weight)
+        self.available_sport_exercise_time_list = None
+        self.exercise_task_list = None
+        self.multi_exercise_task_list = None
 
     def work(self):
+        self.exercise_task_list = []
+        self.available_sport_exercise_time_list = self.__get_exercise_time__(self.available_sport_list, self.net_heat)
+        for i in range(len(self.available_sport_exercise_time_list) - 1):
+            sport = self.available_sport_list[i]
+            time = self.available_sport_exercise_time_list[i]
+            self.exercise_task_list.append(ExerciseTask(sport, time))
+        self.multi_exercise_task_list = []
+        i = 0
+        while i < len(self.available_sport_list) / 3:
+            multi_task_list = []
+            task = self.exercise_task_list[i]
+            multi_task_list.append(ExerciseTask(task.sport, task.time / 2))
+            task = self.exercise_task_list[i + 1]
+            multi_task_list.append(ExerciseTask(task.sport, task.time / 2))
+            task = self.exercise_task_list[i + 2]
+            multi_task_list.append(ExerciseTask(task.sport, task.time / 2))
+            self.multi_exercise_task_list.append(MultiExerciseTask(multi_task_list))
+            i += 3
 
-        pass
-
-    # @staticmethod
-    # def __get_exercise_time__(sport_list):
+    @staticmethod
+    def __get_exercise_time__(sport_list, heat_target):
+        exercise_time_list = []
+        for sport in sport_list:
+            exercise_time = heat_target / sport.calories_per_unit
+            exercise_time_list.append(exercise_time)
+        return exercise_time_list
