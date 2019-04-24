@@ -289,7 +289,7 @@ def httpRequest(url, method='GET', headers=None, body=None, timeout=10):
 
 
 class Bmob:
-    def __init__(self, appid, restkey):
+    def __init__(self, appid='553bcebf8a76c1b58994160184ee8324', restkey='be5915bfc82009fa0ea49038c7b740b6'):
         self.domain = 'https://api2.bmob.cn'
         self.headers = {"X-Bmob-Application-Id": appid, "X-Bmob-REST-API-Key": restkey,
                         "Content-Type": "application/json"}
