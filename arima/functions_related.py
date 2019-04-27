@@ -129,5 +129,5 @@ def func(dta, L, k):
     # 计算偏相关函数
     fai_ex, fai = partial_correlation(rou, k)
     # print 'fai_ex,fai:',fai_ex,fai
-    print('(fai_ex,fai) is ok!!')
+    # print('(fai_ex,fai) is ok!!')
     return dta_diff, dta_len, gamma, mean_dta, dta_w, rou, fai_ex, fai

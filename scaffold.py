@@ -118,9 +118,9 @@ class BodyToleranceCalculator:
                 right = bmi_table[i + 1]
                 if left >= bmi_table >= right:
                     level_index = i + 1
-        # 将[0, len] -> [1, 10]
-        # y = 9/len * x + 1
-        real_level = level_index * 9 / len(bmi_table) + 1
+        # 将[0, len] -> [5, 10]
+        # y = 5/len * x + 1
+        real_level = level_index * 5 / len(bmi_table) + 1
         return real_level
 
     def __evaluate_body_tolerance__(self):
@@ -303,12 +303,12 @@ class MultiExerciseTask:
 
 class ExerciseTaskMaker:
 
-    def __init__(self, user, statistic):
+    def __init__(self, user, statistic, date):
         self.user = user
         worker = AvailableSportGetter(user)
         worker.work()
         self.available_sport_list = worker.available_sport_list
-        predict_income = HeatIncomeModel(user).predict(datetime.date.today() + datetime.timedelta(days=1))
+        predict_income = HeatIncomeModel(user).predict(date)
         self.net_heat = NetHeatCalculator.work(predict_income, statistic.weight)
         self.available_sport_exercise_time_list = None
         self.exercise_task_list = None
