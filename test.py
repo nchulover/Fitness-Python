@@ -1,5 +1,7 @@
 import datetime
 
+import dateutil
+
 from bmob import Bmob, BmobQuerier
 from bmob_beans import FitnessUser, PhysicalStatistic
 from scaffold import HeatIncomeModel, NetHeatCalculator
@@ -18,6 +20,7 @@ if __name__ == '__main__':
                        )
     statistic = PhysicalStatistic(result.jsonData.get('results')[0])
     worker = HeatIncomeModel(user)
-    predict_result = worker.predict(datetime.date.fromisoformat('2019-04-25'))
+    predict_result = worker.predict(dateutil.parser.parse('2019-04-25'))
+    print(predict_result)
     result = NetHeatCalculator().work(predict_result, statistic.weight)
     print(result)

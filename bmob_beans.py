@@ -1,12 +1,14 @@
 import datetime
 
+import dateutil
+
 
 class FitnessUser:
 
     def __init__(self, json):
         self.object_id = json.get('objectId')
         self.gender = int(json.get('gender'))
-        birthday = datetime.datetime.fromisoformat(json.get('birthday').get('iso'))
+        birthday = dateutil.parser.parse(json.get('birthday').get('iso'))
         self.age = self.__calculate_age(birthday.date())
         self.physical_statistic_id = json.get('latestStatistic').get('objectId')
 
@@ -49,6 +51,6 @@ class HeatRecord:
         self.object_id = json.get('objectId')
         self.heat_change = float(json.get('heatChange'))
         self.user_id = json.get('user').get('objectId')
-        self.time = datetime.datetime.fromisoformat(json.get('time').get('iso'))
+        self.time = dateutil.parser.parse(json.get('time').get('iso'))
         # 1早餐2午餐3晚餐4运动消耗, 0不正常数值
         self.type = json.get('type')

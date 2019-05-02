@@ -1,5 +1,7 @@
 import datetime
 
+import dateutil
+import numpy as np
 import pandas as pd
 from sklearn.linear_model import LinearRegression
 
@@ -7,7 +9,7 @@ import database
 from bmob import Bmob, BmobQuerier, BmobPointer
 from bmob_beans import PhysicalStatistic, Sport, HeatRecord
 import matplotlib.pyplot as plt
-import arima.pre_interface  as pre
+import arima.pre_interface as pre
 
 bmob = Bmob()
 
@@ -203,7 +205,7 @@ class UserHeatRecordGetter:
         i = 0
         while i <= len(heat_record_list) - 1:
             today_income = 0
-            today = heat_record_list[i].time.date()
+            today = heat_record_list[i].time
             visited = 0
             for j in range(i, len(heat_record_list)):
                 temp = heat_record_list[j]
@@ -246,19 +248,21 @@ class HeatIncomeModel:
         heat_income_time_list = []
         heat_income_value_list = []
         for heat_income in self.income_heat_record_list:
-            heat_income_time_list.append(str(heat_income.date))
+            date = heat_income.date
+            heat_income_time_list.append(str(datetime.datetime(date.year, date.month, date.day)))
             heat_income_value_list.append(heat_income.heat_change)
         # 获取组装好的时间序列
         full_data_time_series = self.__get_time_series__(heat_income_time_list, heat_income_value_list)
         # self.__draw_ts__(full_data_time_series)
 
-        last_date = datetime.date.fromisoformat(heat_income_time_list[len(heat_income_time_list) - 1])
+        last_date = dateutil.parser.parse(heat_income_time_list[len(heat_income_time_list) - 1])
         date_after = (predict_target_date - last_date).days
         if date_after < 1:
             print('argument wrong!')
             date_after = 1
 
-        predict_result_list = pre.predict(heat_income_value_list, date_after)
+        # predict_result_list = self.__predict_arima__(heat_income_value_list, date_after)
+        predict_result = self.__predict_linear_regression__(heat_income_value_list, date_after)
 
         # 拼接预测
         # for predict_result in predict_result_list:
@@ -268,7 +272,25 @@ class HeatIncomeModel:
         # full_data_time_series = self.__get_time_series__(heat_income_time_list, heat_income_value_list)
         # self.__draw_ts__(full_data_time_series)
 
-        return predict_result_list[date_after - 1]
+        # return predict_result_list[date_after - 1]
+        return predict_result
+
+    @staticmethod
+    def __predict_arima__(heat_income_value_list, date_after):
+        return pre.predict(heat_income_value_list, date_after)
+
+    @staticmethod
+    def __predict_linear_regression__(heat_income_value_list, date_after):
+        model = LinearRegression()
+        X = []
+        Y = []
+        for i in range(len(heat_income_value_list)):
+            X.append([i])
+            Y.append([heat_income_value_list[i]])
+        last_index = len(X) - 1
+        model.fit(X, Y)
+        pre_x = [[last_index + date_after]]
+        return model.predict(pre_x)
 
 
 class NetHeatCalculator:
@@ -322,8 +344,13 @@ class ExerciseTaskMaker:
             time = self.available_sport_exercise_time_list[i]
             self.exercise_task_list.append(ExerciseTask(sport, time))
         self.multi_exercise_task_list = []
+
+        m_list = []
+        for elem in self.available_sport_list:
+            m_list.append(elem)
+        np.random.shuffle(m_list)
         i = 0
-        while i < len(self.available_sport_list) / 3:
+        while i < len(m_list) - 3:
             multi_task_list = []
             task = self.exercise_task_list[i]
             multi_task_list.append(ExerciseTask(task.sport, task.time / 2))
