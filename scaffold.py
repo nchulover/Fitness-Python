@@ -300,7 +300,7 @@ class NetHeatCalculator:
 
     @staticmethod
     def work(predict_income, weight):
-        return predict_income - weight * 18
+        return predict_income - weight * 22
 
 
 class ExerciseTask:
@@ -353,11 +353,11 @@ class ExerciseTaskMaker:
         while i < len(m_list) - 3:
             multi_task_list = []
             task = self.exercise_task_list[i]
-            multi_task_list.append(ExerciseTask(task.sport, task.time / 2))
+            multi_task_list.append(ExerciseTask(task.sport, task.time / 3))
             task = self.exercise_task_list[i + 1]
-            multi_task_list.append(ExerciseTask(task.sport, task.time / 2))
+            multi_task_list.append(ExerciseTask(task.sport, task.time / 3))
             task = self.exercise_task_list[i + 2]
-            multi_task_list.append(ExerciseTask(task.sport, task.time / 2))
+            multi_task_list.append(ExerciseTask(task.sport, task.time / 3))
             self.multi_exercise_task_list.append(MultiExerciseTask(multi_task_list))
             i += 3
 

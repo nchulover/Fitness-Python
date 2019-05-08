@@ -44,7 +44,7 @@ if __name__ == '__main__':
         else:
             continue
 
-        maker = ExerciseTaskMaker(user, statistic, datetime.datetime.today() + datetime.timedelta(days=0))
+        maker = ExerciseTaskMaker(user, statistic, datetime.datetime.today() + datetime.timedelta(days=1))
         maker.work()
         multi_sport_task_list = maker.multi_exercise_task_list
         if len(multi_sport_task_list) > 3:
