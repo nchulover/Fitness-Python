@@ -330,8 +330,8 @@ class ExerciseTaskMaker:
         worker = AvailableSportGetter(user)
         worker.work()
         self.available_sport_list = worker.available_sport_list
-        predict_income = HeatIncomeModel(user).predict(date)
-        self.net_heat = NetHeatCalculator.work(predict_income, statistic.weight)
+        self.predict_income = HeatIncomeModel(user).predict(date)
+        self.net_heat = NetHeatCalculator.work(self.predict_income, statistic.weight)
         self.available_sport_exercise_time_list = None
         self.exercise_task_list = None
         self.multi_exercise_task_list = None

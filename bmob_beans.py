@@ -35,6 +35,15 @@ class Sport:
         self.difficulty = int(json.get('difficulty'))
 
 
+class Meal:
+
+    def __init__(self, json):
+        self.object_id = json.get('objectId')
+        self.meal_name = json.get('mealName')
+        self.calories = float(json.get('kCal'))
+        self.type = int(json.get('type'))
+
+
 class PhysicalStatistic:
 
     def __init__(self, json):
