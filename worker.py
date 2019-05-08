@@ -33,17 +33,17 @@ def __get_sport_recommend_dic__(user_id, multi_sport_task):
 def __get_meal_recommend_dic__(user_id, breakfast_meal_list, lunch_meal_list, dinner_meal_list):
     meal_id_list_string = '['
     for meal in breakfast_meal_list:
-        meal_id_list_string = meal_id_list_string + '\"' + meal.meal_name + '\",'
+        meal_id_list_string = meal_id_list_string + '\"' + meal.object_id + '\",'
     meal_id_list_string = meal_id_list_string[:-1] + ']'
     breakfast_meal_list_string = meal_id_list_string
     meal_id_list_string = '['
     for meal in lunch_meal_list:
-        meal_id_list_string = meal_id_list_string + '\"' + meal.meal_name + '\",'
+        meal_id_list_string = meal_id_list_string + '\"' + meal.object_id + '\",'
     meal_id_list_string = meal_id_list_string[:-1] + ']'
     lunch_meal_list_string = meal_id_list_string
     meal_id_list_string = '['
     for meal in dinner_meal_list:
-        meal_id_list_string = meal_id_list_string + '\"' + meal.meal_name + '\",'
+        meal_id_list_string = meal_id_list_string + '\"' + meal.object_id + '\",'
     meal_id_list_string = meal_id_list_string[:-1] + ']'
     dinner_meal_list_string = meal_id_list_string
     return {
