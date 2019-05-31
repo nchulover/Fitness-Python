@@ -82,7 +82,7 @@ def calc_meal_list(meal_list, target_calories, type):
 
 if __name__ == '__main__':
 
-    result = bmob.find('_User').jsonData.get('results')
+    result = bmob.find('_User', BmobQuerier().addWhereEqualTo('objectId', '0f1d4db0bf')).jsonData.get('results')
     user_list = []
     for json in result:
         user_list.append(FitnessUser(json))
